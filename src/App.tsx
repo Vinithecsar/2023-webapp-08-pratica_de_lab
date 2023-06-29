@@ -1,33 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState } from "react";
 import './App.css'
+import axios from 'axios'
+
+const api = axios.create({
+  baseURL: 'https://infoweb-api.vercel.app/uf'
+})
+
+const AppNavBar = () => {
+  return (
+  <h1>Título da aplicação</h1>
+  )
+}
+
+const AppUFLista = () => {
+  const listaUfs = [
+    {nome:'São Paulo', sigla:'SP'},
+    {nome:'Rio Grande do Norte', sigla:'RN'},
+    {nome:'Amazonas', sigla:'AM'},
+    {nome:'Alagoas', sigla:'AL'},
+    {nome:'Paraíba', sigla:'PB'}
+  ]
+  return (
+  <div classNome='card'>
+    <ul>
+    {listaUfs.map( (unid : string, index: number) => {
+      return <li key={index}>{unid.sigla}</li>
+    }
+    )}
+    </ul>
+  </div>
+  )
+}
+
+const AppUFDetalhe = (props:any) => {
+  return (
+    <p>{props.sigla} | {props.nome}</p>
+  )
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [listaUfs,setListaUfs] = useState([])
+  const [uf, setUf] = useState({})
+
+  const tratarClique = () => {
+    api.get('uf').then((response) => {
+      const lista = response.data.map((item:any => item.sigla))
+    })
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <AppNavBar />
+    <AppUFDetalhe sigla = {uf.sigla} nome = {uf.nome}/>
+    <AppUFLista />
     </>
   )
 }
