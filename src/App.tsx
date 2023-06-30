@@ -21,7 +21,7 @@ const AppUFLista = () => {
     {nome:'Paraíba', sigla:'PB'}
   ]
   return (
-  <div classNome='card'>
+  <div className='card'>
     <ul>
     {listaUfs.map( (unid : string, index: number) => {
       return <li key={index}>{unid.sigla}</li>
