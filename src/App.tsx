@@ -1,58 +1,69 @@
-import { useState } from "react";
+import { useState } from 'react';
 import './App.css'
-import axios from 'axios'
+import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://infoweb-api.vercel.app/uf'
+  baseURL: 'https://infoweb-api.vercel.app'
 })
 
-const AppNavBar = () => {
+const AppNavBar = (props : any) => {
+  const TratarClique = (e: any) => {
+    props.setCarregando(false)
+    api.get('/uf')
+      .then((resposta) => resposta.data.data)
+      .then((json) => props.mudar(json))
+  }
   return (
+  <div className='card'>
   <h1>Título da aplicação</h1>
+  {
+    props.carregando && (<button onClick={TratarClique}>Atualizar lista de UFs</button>)
+  }
+  </div>
   )
 }
 
-const AppUFLista = () => {
-  const listaUfs = [
-    {nome:'São Paulo', sigla:'SP'},
-    {nome:'Rio Grande do Norte', sigla:'RN'},
-    {nome:'Amazonas', sigla:'AM'},
-    {nome:'Alagoas', sigla:'AL'},
-    {nome:'Paraíba', sigla:'PB'}
-  ]
+const AppUFLista = (props : any) => {
   return (
   <div className='card'>
-    <ul>
-    {listaUfs.map( (unid : string, index: number) => {
-      return <li key={index}>{unid.sigla}</li>
-    }
-    )}
+    <ul style={{listStyle : 'none'}}>
+      {props.dados.map(
+        (item : any) => (
+          <button 
+          key={item.sigla}
+          onClick={(e) => props.mudar(item)}>
+            {item.sigla}
+          </button>
+        )
+      )}
     </ul>
   </div>
   )
 }
 
-const AppUFDetalhe = (props:any) => {
+const AppUFDetalhe = (props : any) => {
+  
   return (
-    <p>{props.sigla} | {props.nome}</p>
+    <div className='card'>
+      <p>{props.dados.sigla}</p>
+      <p>{props.dados.nome}</p>
+    </div>
   )
 }
 
 function App() {
-  const [listaUfs,setListaUfs] = useState([])
-  const [uf, setUf] = useState({})
-
-  const tratarClique = () => {
-    api.get('uf').then((response) => {
-      const lista = response.data.map((item:any => item.sigla))
-    })
-  }
+  const [uf, setUf] = useState({
+    sigla:'',
+    nome:''
+  })
+  const [ufs, setUfs] = useState([])
+  const [carregando, setCarregando] = useState(true)
 
   return (
     <>
-    <AppNavBar />
-    <AppUFDetalhe sigla = {uf.sigla} nome = {uf.nome}/>
-    <AppUFLista />
+    <AppNavBar mudar={setUfs} carregando={carregando} setCarregando={setCarregando}/>
+    <AppUFDetalhe dados={uf}/>
+    <AppUFLista dados={ufs} mudar={setUf}/>
     </>
   )
 }
